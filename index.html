@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SecretCode – Knacke den geheimen Code</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at top, #243b55 0%, #141e30 45%, #080b12 100%);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 850px;
+            background: rgba(15, 20, 32, 0.96);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 24px;
+            padding: 35px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        .logo {
+            text-align: center;
+            font-size: 48px;
+            margin-bottom: 8px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: clamp(30px, 6vw, 52px);
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #aeb8c9;
+            font-size: 17px;
+            margin-bottom: 30px;
+        }
+
+        .progress {
+            width: 100%;
+            height: 10px;
+            background: #252d3d;
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 20%;
+            background: #4f8cff;
+            transition: width 0.4s ease;
+        }
+
+        .question-box {
+            background: #1a2130;
+            border-radius: 18px;
+            padding: 30px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .question-number {
+            color: #6ea0ff;
+            font-weight: bold;
+            font-size: 15px;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .question {
+            font-size: clamp(21px, 4vw, 30px);
+            line-height: 1.4;
+            margin-bottom: 25px;
+        }
+
+        .answer-input {
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            border: 2px solid #303a4d;
+            background: #0e131d;
+            color: white;
+            font-size: 18px;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        .answer-input:focus {
+            border-color: #4f8cff;
+            box-shadow: 0 0 15px rgba(79,140,255,0.2);
+        }
+
+        .button {
+            width: 100%;
+            margin-top: 15px;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            background: #4f8cff;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .button:hover {
+            background: #3979ed;
+            transform: translateY(-1px);
+        }
+
+        .message {
+            min-height: 25px;
+            text-align: center;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        .correct {
+            color: #4ade80;
+        }
+
+        .wrong {
+            color: #ff6b6b;
+        }
+
+        .code-area {
+            display: none;
+            text-align: center;
+        }
+
+        .code-area h2 {
+            font-size: 32px;
+            margin-bottom: 15px;
+        }
+
+        .code-area p {
+            color: #aeb8c9;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .digits {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 25px 0;
+            flex-wrap: wrap;
+        }
+
+        .digit {
+            width: 58px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #0c111a;
+            border: 2px solid #4f8cff;
+            border-radius: 12px;
+            font-size: 30px;
+            font-weight: bold;
+        }
+
+        .code-input {
+            width: 100%;
+            max-width: 400px;
+            padding: 17px;
+            text-align: center;
+            font-size: 24px;
+            letter-spacing: 8px;
+            border-radius: 12px;
+            border: 2px solid #303a4d;
+            background: #0e131d;
+            color: white;
+            outline: none;
+        }
+
+        .success {
+            display: none;
+            text-align: center;
+            padding: 25px;
+        }
+
+        .success-icon {
+            font-size: 70px;
+            margin-bottom: 15px;
+        }
+
+        .success h2 {
+            font-size: 36px;
+            margin-bottom: 12px;
+        }
+
+        .success p {
+            color: #aeb8c9;
+            font-size: 18px;
+            line-height: 1.5;
+        }
+
+        .attempts {
+            text-align: center;
+            color: #8893a7;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        footer {
+            text-align: center;
+            color: #687386;
+            margin-top: 25px;
+            font-size: 13px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+                border-radius: 18px;
+            }
+
+            .question-box {
+                padding: 20px;
+            }
+
+            .logo {
+                font-size: 38px;
+            }
+
+            .digits {
+                gap: 7px;
+            }
+
+            .digit {
+                width: 50px;
+                height: 60px;
+                font-size: 25px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="logo">🔐</div>
+
+    <h1>SECRET CODE</h1>
+
+    <p class="subtitle">
+        Löse die Rätsel und finde den geheimen Code.
+    </p>
+
+    <div id="game">
+
+        <div class="progress">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <div class="question-box">
+
+            <div class="question-number" id="questionNumber">
+                Rätsel 1 von 5
+            </div>
+
+            <div class="question" id="question">
+                Lade Rätsel...
+            </div>
+
+            <input
+                type="text"
+                id="answer"
+                class="answer-input"
+                placeholder="Deine Antwort..."
+                autocomplete="off"
+            >
+
+            <button class="button" onclick="checkAnswer()">
+                Antwort prüfen
+            </button>
+
+            <div class="message" id="message"></div>
+
+        </div>
+
+    </div>
+
+
+    <div class="code-area" id="codeArea">
+
+        <h2>🎉 Alle Rätsel gelöst!</h2>
+
+        <p>
+            Du hast alle fünf Rätsel richtig beantwortet.
+            Die gesammelten Zahlen ergeben deinen Code.
+        </p>
+
+        <div class="digits" id="digits"></div>
+
+        <p>
+            Gib den vollständigen Code ein:
+        </p>
+
+        <input
+            type="text"
+            id="codeInput"
+            class="code-input"
+            maxlength="5"
+            inputmode="numeric"
+            placeholder="•••••"
+        >
+
+        <button class="button" onclick="checkCode()">
+            🔓 Code überprüfen
+        </button>
+
+        <div class="message" id="codeMessage"></div>
+
+        <div class="attempts" id="attempts">
+            Versuche: 0 / 5
+        </div>
+
+    </div>
+
+
+    <div class="success" id="success">
+
+        <div class="success-icon">🏆</div>
+
+        <h2>GEKNACKT!</h2>
+
+        <p>
+            Unglaublich! Du hast den SecretCode erfolgreich geknackt.
+            <br><br>
+            Du hast bewiesen, dass du logisch denken kannst! 🧠
+        </p>
+
+    </div>
+
+    <footer>
+        SecretCode • Rätselprojekt
+    </footer>
+
+</div>
+
+
+<script>
+
+    /*
+     * =========================================
+     * SECRET CODE RÄTSEL
+     * =========================================
+     *
+     * Jede richtige Antwort gibt eine Zahl.
+     *
+     * Der finale Code ist:
+     * 73924
+     *
+     * Du kannst die Rätsel später problemlos ändern.
+     */
+
+    const puzzles = [
+
+        {
+            question:
+                "Ich habe vier Beine, kann aber nicht laufen. Was bin ich?",
+
+            answers: [
+                "tisch",
+                "ein tisch",
+                "einen tisch"
+            ],
+
+            digit: "7"
+        },
+
+        {
+            question:
+                "Wie viele Tage hat eine normale Woche?",
+
+            answers: [
+                "7",
+                "sieben"
+            ],
+
+            digit: "3"
+        },
+
+        {
+            question:
+                "Welche Zahl kommt nach 8?",
+
+            answers: [
+                "9",
+                "neun"
+            ],
+
+            digit: "9"
+        },
+
+        {
+            question:
+                "Wie viele Seiten hat ein Dreieck?",
+
+            answers: [
+                "3",
+                "drei"
+            ],
+
+            digit: "2"
+        },
+
+        {
+            question:
+                "Welche Zahl ist größer: 4 oder 5?",
+
+            answers: [
+                "5",
+                "fünf"
+            ],
+
+            digit: "4"
+        }
+
+    ];
+
+
+    let currentPuzzle = 0;
+
+    let collectedDigits = [];
+
+    let codeAttempts = 0;
+
+    const MAX_ATTEMPTS = 5;
+
+
+    /*
+     * Rätsel anzeigen
+     */
+
+    function showPuzzle() {
+
+        const puzzle = puzzles[currentPuzzle];
+
+        document.getElementById("questionNumber").textContent =
+            "Rätsel " + (currentPuzzle + 1) + " von " + puzzles.length;
+
+        document.getElementById("question").textContent =
+            puzzle.question;
+
+        document.getElementById("answer").value = "";
+
+        document.getElementById("message").textContent = "";
+
+        const progress =
+            ((currentPuzzle + 1) / puzzles.length) * 100;
+
+        document.getElementById("progressBar").style.width =
+            progress + "%";
+
+        document.getElementById("answer").focus();
+
+    }
+
+
+    /*
+     * Antwort überprüfen
+     */
+
+    function checkAnswer() {
+
+        const input =
+            document.getElementById("answer").value
+            .trim()
+            .toLowerCase();
+
+        const message =
+            document.getElementById("message");
+
+        if (input === "") {
+
+            message.textContent =
+                "Bitte gib eine Antwort ein.";
+
+            message.className =
+                "message wrong";
+
+            return;
+        }
+
+
+        const puzzle = puzzles[currentPuzzle];
+
+        const isCorrect =
+            puzzle.answers.some(answer =>
+                input === answer.toLowerCase()
+            );
+
+
+        if (isCorrect) {
+
+            collectedDigits.push(puzzle.digit);
+
+            message.textContent =
+                "✅ Richtig!";
+
+            message.className =
+                "message correct";
+
+
+            setTimeout(() => {
+
+                currentPuzzle++;
+
+                if (currentPuzzle < puzzles.length) {
+
+                    showPuzzle();
+
+                } else {
+
+                    showCodeScreen();
+
+                }
+
+            }, 900);
+
+
+        } else {
+
+            message.textContent =
+                "❌ Leider falsch. Versuch es noch einmal!";
+
+            message.className =
+                "message wrong";
+
+        }
+
+    }
+
+
+    /*
+     * Code-Seite anzeigen
+     */
+
+    function showCodeScreen() {
+
+        document.getElementById("game").style.display =
+            "none";
+
+        document.getElementById("codeArea").style.display =
+            "block";
+
+
+        const digits =
+            document.getElementById("digits");
+
+        digits.innerHTML = "";
+
+
+        collectedDigits.forEach(digit => {
+
+            const element =
+                document.createElement("div");
+
+            element.className = "digit";
+
+            element.textContent = "★";
+
+            digits.appendChild(element);
+
+        });
+
+    }
+
+
+    /*
+     * Finalen Code überprüfen
+     */
+
+    function checkCode() {
+
+        if (codeAttempts >= MAX_ATTEMPTS) {
+
+            return;
+
+        }
+
+
+        const enteredCode =
+            document.getElementById("codeInput").value.trim();
+
+        const correctCode =
+            collectedDigits.join("");
+
+
+        const message =
+            document.getElementById("codeMessage");
+
+
+        if (!/^\d{5}$/.test(enteredCode)) {
+
+            message.textContent =
+                "Bitte gib einen 5-stelligen Code ein.";
+
+            message.className =
+                "message wrong";
+
+            return;
+
+        }
+
+
+        codeAttempts++;
+
+
+        document.getElementById("attempts").textContent =
+            "Versuche: " +
+            codeAttempts +
+            " / " +
+            MAX_ATTEMPTS;
+
+
+        if (enteredCode === correctCode) {
+
+            document.getElementById("codeArea").style.display =
+                "none";
+
+            document.getElementById("success").style.display =
+                "block";
+
+        } else {
+
+            const remaining =
+                MAX_ATTEMPTS - codeAttempts;
+
+            if (remaining > 0) {
+
+                message.textContent =
+                    "❌ Falscher Code! Noch " +
+                    remaining +
+                    " Versuch" +
+                    (remaining === 1 ? "" : "e") +
+                    ".";
+
+                message.className =
+                    "message wrong";
+
+            } else {
+
+                message.textContent =
+                    "❌ Keine Versuche mehr übrig.";
+
+                message.className =
+                    "message wrong";
+
+                document.getElementById("codeInput").disabled =
+                    true;
+
+            }
+
+        }
+
+    }
+
+
+    /*
+     * Enter-Taste benutzen
+     */
+
+    document.getElementById("answer").addEventListener(
+        "keydown",
+        function(event) {
+
+            if (event.key === "Enter") {
+
+                checkAnswer();
+
+            }
+
+        }
+    );
+
+
+    document.getElementById("codeInput").addEventListener(
+        "keydown",
+        function(event) {
+
+            if (event.key === "Enter") {
+
+                checkCode();
+
+            }
+
+        }
+    );
+
+
+    /*
+     * Spiel starten
+     */
+
+    showPuzzle();
+
+</script>
+
+</body>
+</html>
